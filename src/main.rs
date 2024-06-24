@@ -2,33 +2,34 @@ use rand::{prelude::*, distributions::Standard};
 use std::fmt;
 use std::fmt::Formatter;
 
-#[derive(Debug, Clone, PartialEq)]
-enum RawNote {
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G,
+#[derive(Debug, Clone, PartialEq, Copy)]
+struct RawNote(char);
+
+impl RawNote {
+    fn from(note: char) -> Self {
+        if note < 'A' || note > 'G' {
+            return RawNote('C')
+        }
+        RawNote(note)
+    }
 }
 
 impl fmt::Display for RawNote {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{}", self.0)
     }
 }
 
 impl Distribution<RawNote> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> RawNote {
         match rng.gen_range(0..=6) {
-            0 => RawNote::A,
-            1 => RawNote::B,
-            2 => RawNote::C,
-            3 => RawNote::D,
-            4 => RawNote::E,
-            5 => RawNote::F,
-            6 => RawNote::G,
+            0 => RawNote::from('A'),
+            1 => RawNote::from('B'),
+            2 => RawNote::from('C'),
+            3 => RawNote::from('D'),
+            4 => RawNote::from('E'),
+            5 => RawNote::from('F'),
+            6 => RawNote::from('G'),
             _ => panic!("outside of note range")
         }
     }
@@ -49,7 +50,7 @@ impl Distribution<Note> for Standard {
 impl Default for Note {
     fn default() -> Self {
         Note {
-            raw_note: RawNote::C,
+            raw_note: RawNote::from('C'),
             pitch: Pitch::Natural,
         }
     }
@@ -65,21 +66,21 @@ impl Note {
     // Adjust any half step pitched notes (e.g. B# -> C)
     fn normalize(&mut self) {
         let (n, p) = (self.raw_note.clone(), self.pitch.clone());
-        match (n, p) {
-            (RawNote::B, Pitch::Sharp) => {
-                self.raw_note = RawNote::C;
+        match (n.0, p) {
+            ('B', Pitch::Sharp) => {
+                self.raw_note = RawNote::from('C');
                 self.pitch = Pitch::Natural;
             }
-            (RawNote::C, Pitch::Flat) => {
-                self.raw_note = RawNote::B;
+            ('C', Pitch::Flat) => {
+                self.raw_note = RawNote::from('B');
                 self.pitch = Pitch::Natural;
             }
-            (RawNote::E, Pitch::Sharp) => {
-                self.raw_note = RawNote::F;
+            ('E', Pitch::Sharp) => {
+                self.raw_note = RawNote::from('F');
                 self.pitch = Pitch::Natural;
             }
-            (RawNote::F, Pitch::Flat) => {
-                self.raw_note = RawNote::E;
+            ('F', Pitch::Flat) => {
+                self.raw_note = RawNote::from('E');
                 self.pitch = Pitch::Natural;
             }
             _ => ()
@@ -241,7 +242,6 @@ impl ChordProgression {
 }
 
 fn solve_interval(root: Note, tone: ScaleTone) -> Note {
-
     todo!()
 }
 
