@@ -49,7 +49,7 @@ impl RawNote {
 }
 
 impl fmt::Display for RawNote {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.0)
     }
 }
@@ -95,6 +95,18 @@ impl Note {
         let mut note = Note { raw_note: RawNote::from(raw_note), pitch };
         note.normalize();
         note
+    }
+
+    fn sharp_to_flat(&self) -> Note {
+        if self.pitch != Pitch::Sharp {
+            return self.clone();
+        }
+        let position = RAW_NOTE_MAP
+            .iter()
+            .position(|&x| x == self.raw_note.0)
+            .unwrap();
+        let new_position = (position + 1) % RAW_NOTE_MAP.len();
+        Note::new(RAW_NOTE_MAP[new_position], Pitch::Flat)
     }
 
     fn flat_to_sharp(&self) -> Note {
@@ -274,23 +286,57 @@ struct ChordProgression {
     root: Note,
     tones: Vec<GenericChord>,
     chords: Vec<Chord>,
+    key: Key,
 }
 
 impl ChordProgression {
-    fn new(root: &Note, tones: &Vec<GenericChord>) -> Self {
+    fn new(root: &Note, key: &Key, tones: &Vec<GenericChord>) -> Self {
         let chords = tones
             .iter()
             .map(|gc| gc.clone().into_chord(root.clone()))
             .collect();
         let tones = tones.to_owned();
         let root = root.to_owned();
+        let key = key.to_owned();
 
-        ChordProgression {
+        let mut res = ChordProgression {
             root,
             tones,
             chords,
+            key,
+        };
+
+        res.auto_convert_flats();
+        res
+    }
+
+    fn auto_convert_flats(&mut self) {
+        if self.key == Key::Major
+            && ((self.root.raw_note.0 == 'F' && self.root.pitch == Pitch::Natural)
+            || (self.root.raw_note.0 == 'A' && self.root.pitch == Pitch::Sharp)
+            || (self.root.raw_note.0 == 'D' && self.root.pitch == Pitch::Sharp)
+            || (self.root.raw_note.0 == 'G' && self.root.pitch == Pitch::Sharp)
+            || (self.root.raw_note.0 == 'C' && self.root.pitch == Pitch::Sharp)) {
+            for mut c in &mut self.chords {
+                c.note = c.note.sharp_to_flat();
+            }
+        } else if self.key == Key::Minor
+            && ((self.root.raw_note.0 == 'D'&& self.root.pitch == Pitch::Natural)
+            || (self.root.raw_note.0 == 'G'&& self.root.pitch == Pitch::Natural)
+            || (self.root.raw_note.0 == 'D'&& self.root.pitch == Pitch::Natural)
+            || (self.root.raw_note.0 == 'F'&& self.root.pitch == Pitch::Natural)
+            || (self.root.raw_note.0 == 'A' && self.root.pitch == Pitch::Sharp)) {
+            for mut c in &mut self.chords {
+                c.note = c.note.sharp_to_flat();
+            }
         }
     }
+}
+
+#[derive(Debug, PartialEq, Clone)]
+enum Key {
+    Major,
+    Minor,
 }
 
 fn solve_interval(root: Note, tone: ScaleTone) -> Note {
@@ -333,7 +379,7 @@ fn main() {
     ];
 
     for note in &NOTE_MAP {
-        let progression = ChordProgression::new(note, &gen_chords);
+        let progression = ChordProgression::new(note, &Key::Major, &gen_chords);
         let chart = format_chord_chart(progression.chords);
         println!("{}", chart);
     }
