@@ -1,8 +1,11 @@
 #![allow(dead_code)]
 
+mod generic_progressions;
+
 use rand::{prelude::*, distributions::Standard};
 use std::fmt;
 use std::fmt::Formatter;
+use generic_progressions::*;
 
 static NOTE_MAP: [Note; 12] = [
     Note { raw_note: RawNote('A'), pitch: Pitch::Natural },
@@ -284,24 +287,25 @@ impl GenericChord {
 
 struct ChordProgression {
     root: Note,
-    tones: Vec<GenericChord>,
     chords: Vec<Chord>,
     key: Key,
 }
 
 impl ChordProgression {
-    fn new(root: &Note, key: &Key, tones: &Vec<GenericChord>) -> Self {
+    fn new<I>(root: &Note, key: &Key, tones: &I) -> Self
+        where
+            I: IntoIterator<Item=GenericChord> + Clone,
+    {
         let chords = tones
-            .iter()
+            .clone()
+            .into_iter()
             .map(|gc| gc.clone().into_chord(root.clone()))
             .collect();
-        let tones = tones.to_owned();
         let root = root.to_owned();
         let key = key.to_owned();
 
         let mut res = ChordProgression {
             root,
-            tones,
             chords,
             key,
         };
@@ -317,16 +321,16 @@ impl ChordProgression {
             || (self.root.raw_note.0 == 'D' && self.root.pitch == Pitch::Sharp)
             || (self.root.raw_note.0 == 'G' && self.root.pitch == Pitch::Sharp)
             || (self.root.raw_note.0 == 'C' && self.root.pitch == Pitch::Sharp)) {
-            for mut c in &mut self.chords {
+            for c in &mut self.chords {
                 c.note = c.note.sharp_to_flat();
             }
         } else if self.key == Key::Minor
-            && ((self.root.raw_note.0 == 'D'&& self.root.pitch == Pitch::Natural)
-            || (self.root.raw_note.0 == 'G'&& self.root.pitch == Pitch::Natural)
-            || (self.root.raw_note.0 == 'D'&& self.root.pitch == Pitch::Natural)
-            || (self.root.raw_note.0 == 'F'&& self.root.pitch == Pitch::Natural)
+            && ((self.root.raw_note.0 == 'D' && self.root.pitch == Pitch::Natural)
+            || (self.root.raw_note.0 == 'G' && self.root.pitch == Pitch::Natural)
+            || (self.root.raw_note.0 == 'D' && self.root.pitch == Pitch::Natural)
+            || (self.root.raw_note.0 == 'F' && self.root.pitch == Pitch::Natural)
             || (self.root.raw_note.0 == 'A' && self.root.pitch == Pitch::Sharp)) {
-            for mut c in &mut self.chords {
+            for c in &mut self.chords {
                 c.note = c.note.sharp_to_flat();
             }
         }
@@ -372,19 +376,14 @@ fn format_chord_chart(chord: Vec<Chord>) -> String {
 }
 
 fn main() {
-    let gen_chords = vec![
-        GenericChord::new(ScaleTone::Two, ChordType::MinorSeven),
-        GenericChord::new(ScaleTone::Five, ChordType::DominantSeven),
-        GenericChord::new(ScaleTone::One, ChordType::MajorSeven),
-    ];
-
     for note in &NOTE_MAP {
-        let progression = ChordProgression::new(note, &Key::Major, &gen_chords);
+        let progression = ChordProgression::new(note, &Key::Major, &BLUES_STANDARD);
         let chart = format_chord_chart(progression.chords);
         println!("{}", chart);
     }
 
     // let chart = generate_random_chord_chart(32);
+
 }
 
 #[cfg(test)]
