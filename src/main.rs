@@ -1,6 +1,40 @@
+#![allow(dead_code)]
+
 use rand::{prelude::*, distributions::Standard};
 use std::fmt;
 use std::fmt::Formatter;
+
+static NOTE_MAP: [Note; 12] = [
+    Note { raw_note: RawNote('A'), pitch: Pitch::Natural },
+    Note { raw_note: RawNote('A'), pitch: Pitch::Sharp },
+    Note { raw_note: RawNote('B'), pitch: Pitch::Natural },
+    Note { raw_note: RawNote('C'), pitch: Pitch::Natural },
+    Note { raw_note: RawNote('C'), pitch: Pitch::Sharp },
+    Note { raw_note: RawNote('D'), pitch: Pitch::Natural },
+    Note { raw_note: RawNote('D'), pitch: Pitch::Sharp },
+    Note { raw_note: RawNote('E'), pitch: Pitch::Natural },
+    Note { raw_note: RawNote('F'), pitch: Pitch::Natural },
+    Note { raw_note: RawNote('F'), pitch: Pitch::Sharp },
+    Note { raw_note: RawNote('G'), pitch: Pitch::Natural },
+    Note { raw_note: RawNote('G'), pitch: Pitch::Sharp },
+];
+
+const RAW_NOTE_MAP: [char; 7] = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+
+const TONE_MAP: [ScaleTone; 12] = [
+    ScaleTone::One,
+    ScaleTone::FlatTwo,
+    ScaleTone::Two,
+    ScaleTone::FlatThree,
+    ScaleTone::Three,
+    ScaleTone::Four,
+    ScaleTone::FlatFive,
+    ScaleTone::Five,
+    ScaleTone::FlatSix,
+    ScaleTone::Six,
+    ScaleTone::FlatSeven,
+    ScaleTone::Seven,
+];
 
 #[derive(Debug, Clone, PartialEq, Copy)]
 struct RawNote(char);
@@ -8,7 +42,7 @@ struct RawNote(char);
 impl RawNote {
     fn from(note: char) -> Self {
         if note < 'A' || note > 'G' {
-            return RawNote('C')
+            return RawNote('C');
         }
         RawNote(note)
     }
@@ -42,7 +76,7 @@ struct Note {
 }
 
 impl Distribution<Note> for Standard {
-    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Note {
+    fn sample<R: Rng + ?Sized>(&self, _rng: &mut R) -> Note {
         Note::new(random(), random())
     }
 }
@@ -57,10 +91,26 @@ impl Default for Note {
 }
 
 impl Note {
-    fn new(raw_note: RawNote, pitch: Pitch) -> Self {
-        let mut note = Note { raw_note, pitch };
+    fn new(raw_note: char, pitch: Pitch) -> Self {
+        let mut note = Note { raw_note: RawNote::from(raw_note), pitch };
         note.normalize();
         note
+    }
+
+    fn flat_to_sharp(&self) -> Note {
+        if self.pitch != Pitch::Flat {
+            return self.clone();
+        }
+        let position = RAW_NOTE_MAP
+            .iter()
+            .position(|&x| x == self.raw_note.0)
+            .unwrap();
+        let new_position: usize;
+        match position {
+            0 => new_position = RAW_NOTE_MAP.len() - 1,
+            _ => new_position = position - 1,
+        }
+        Note::new(RAW_NOTE_MAP[new_position], Pitch::Sharp)
     }
 
     // Adjust any half step pitched notes (e.g. B# -> C)
@@ -179,7 +229,7 @@ impl Chord {
     }
 
     fn random() -> Chord {
-        let mut chord = Chord {
+        let chord = Chord {
             note: random(),
             chord_type: random(),
         };
@@ -227,11 +277,13 @@ struct ChordProgression {
 }
 
 impl ChordProgression {
-    fn new(root: Note, tones: Vec<GenericChord>) -> Self {
+    fn new(root: &Note, tones: &Vec<GenericChord>) -> Self {
         let chords = tones
             .iter()
             .map(|gc| gc.clone().into_chord(root.clone()))
             .collect();
+        let tones = tones.to_owned();
+        let root = root.to_owned();
 
         ChordProgression {
             root,
@@ -242,15 +294,23 @@ impl ChordProgression {
 }
 
 fn solve_interval(root: Note, tone: ScaleTone) -> Note {
-    todo!()
+    let root = root.flat_to_sharp();
+    let position = NOTE_MAP.iter().position(|n| *n == root).unwrap();
+
+    let shift = TONE_MAP.iter().position(|t| *t == tone).unwrap();
+    let new_position = (position + shift) % NOTE_MAP.len();
+    NOTE_MAP.get(new_position).unwrap().clone()
 }
 
 fn generate_random_chord_chart(n: u8) -> String {
-    let mut chord: Vec<Chord> = vec![];
+    let mut chords: Vec<Chord> = vec![];
     for _ in 0..n {
-        chord.push(Chord::random());
+        chords.push(Chord::random());
     }
+    format_chord_chart(chords)
+}
 
+fn format_chord_chart(chord: Vec<Chord>) -> String {
     let mut chart = String::new();
     chord
         .chunks(4)
@@ -266,6 +326,39 @@ fn generate_random_chord_chart(n: u8) -> String {
 }
 
 fn main() {
-    let chart = generate_random_chord_chart(32);
-    print!("{}", chart);
+    let gen_chords = vec![
+        GenericChord::new(ScaleTone::Two, ChordType::MinorSeven),
+        GenericChord::new(ScaleTone::Five, ChordType::DominantSeven),
+        GenericChord::new(ScaleTone::One, ChordType::MajorSeven),
+    ];
+
+    for note in &NOTE_MAP {
+        let progression = ChordProgression::new(note, &gen_chords);
+        let chart = format_chord_chart(progression.chords);
+        println!("{}", chart);
+    }
+
+    // let chart = generate_random_chord_chart(32);
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{Note, Pitch, ScaleTone, solve_interval};
+
+    #[test]
+    fn interval_solver() {
+        let note = Note::new('D', Pitch::Natural);
+
+        let five = ScaleTone::Five;
+        let new = solve_interval(note.clone(), five);
+        assert_eq!(new, Note::new('A', Pitch::Natural));
+
+        let flat_two = ScaleTone::FlatTwo;
+        let new = solve_interval(note.clone(), flat_two);
+        assert_eq!(new, Note::new('D', Pitch::Sharp));
+
+        let seven = ScaleTone::Seven;
+        let new = solve_interval(note.clone(), seven);
+        assert_eq!(new, Note::new('C', Pitch::Sharp));
+    }
 }
