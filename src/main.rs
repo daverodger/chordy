@@ -7,6 +7,8 @@ use std::fmt;
 use std::fmt::Formatter;
 use generic_progressions::*;
 
+const CHORD_MAX_LEN: usize = 6;
+
 static NOTE_MAP: [Note; 12] = [
     Note { raw_note: RawNote('A'), pitch: Pitch::Natural },
     Note { raw_note: RawNote('A'), pitch: Pitch::Sharp },
@@ -285,22 +287,37 @@ impl GenericChord {
     }
 }
 
+#[derive(Debug, PartialEq, Clone)]
+struct GenericChordSynced {
+    generic_chord: GenericChord,
+    beats: u8,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+struct ChordSynced {
+    chord: Chord,
+    beats: u8,
+}
+
 struct ChordProgression {
     root: Note,
-    chords: Vec<Chord>,
+    chords: Vec<ChordSynced>,
     key: Key,
 }
 
 impl ChordProgression {
     fn new<I>(root: &Note, key: &Key, tones: &I) -> Self
         where
-            I: IntoIterator<Item=GenericChord> + Clone,
+            I: IntoIterator<Item=GenericChordSynced> + Clone,
     {
         let chords = tones
             .clone()
             .into_iter()
-            .map(|gc| gc.clone().into_chord(root.clone()))
-            .collect();
+            .map(|gc| ChordSynced {
+                chord: gc.clone().generic_chord.into_chord(root.clone()),
+                beats: gc.beats,
+            })
+            .collect::<Vec<ChordSynced>>();
         let root = root.to_owned();
         let key = key.to_owned();
 
@@ -322,7 +339,7 @@ impl ChordProgression {
             || (self.root.raw_note.0 == 'G' && self.root.pitch == Pitch::Sharp)
             || (self.root.raw_note.0 == 'C' && self.root.pitch == Pitch::Sharp)) {
             for c in &mut self.chords {
-                c.note = c.note.sharp_to_flat();
+                c.chord.note = c.chord.note.sharp_to_flat();
             }
         } else if self.key == Key::Minor
             && ((self.root.raw_note.0 == 'D' && self.root.pitch == Pitch::Natural)
@@ -331,7 +348,7 @@ impl ChordProgression {
             || (self.root.raw_note.0 == 'F' && self.root.pitch == Pitch::Natural)
             || (self.root.raw_note.0 == 'A' && self.root.pitch == Pitch::Sharp)) {
             for c in &mut self.chords {
-                c.note = c.note.sharp_to_flat();
+                c.chord.note = c.chord.note.sharp_to_flat();
             }
         }
     }
@@ -367,7 +384,7 @@ fn format_chord_chart(chord: Vec<Chord>) -> String {
         .for_each(|x| {
             chart.push('|');
             for c in x {
-                chart.push_str(&format!("{:^10}|", c.to_string()))
+                chart.push_str(&format!(" {:<1$} |", c.to_string(), CHORD_MAX_LEN))
             }
             chart.push_str("\n");
         }
@@ -375,15 +392,60 @@ fn format_chord_chart(chord: Vec<Chord>) -> String {
     chart
 }
 
+fn format_synced_chord_chart(chords: Vec<ChordSynced>) -> String {
+    // Beat value determines max_width
+    let mut min = 4;
+    for c in &chords {
+        if c.beats < min {
+            min = c.beats;
+            if min == 3 || min == 1 { break; }
+        }
+    }
+    let max_width = match min {
+        4 => CHORD_MAX_LEN,
+        1 | 3 => CHORD_MAX_LEN * 4 + 6,
+        2 => CHORD_MAX_LEN * 2 + 2,
+        _ => panic!("error formatting width")
+    };
+
+    let mut chart = String::from("|");
+    let mut beats = 0;
+    let mut bars = 0;
+    for c in chords {
+        bars += 1;
+        beats += c.beats;
+        match c.beats {
+            1 => chart.push_str(&format!(" {:<1$} ", c.chord.to_string(), max_width / 4)),
+            2 => chart.push_str(&format!(" {:<1$} ", c.chord.to_string(), max_width / 2)),
+            3 => chart.push_str(&format!(" {:<1$} ", c.chord.to_string(), (max_width * 2) / 3)),
+            4 => chart.push_str(&format!(" {:<1$} ", c.chord.to_string(), max_width)),
+            _ => panic!("unimplemented beat value")
+        }
+        if beats == 4 {
+            beats = 0;
+            if bars == 4 {
+                bars = 0;
+                chart.push_str("|\n|");
+            } else {
+                chart.push_str("|");
+            }
+        } else if beats > 4 {
+            panic!("unimplemented time signature")
+        }
+    }
+    chart.remove(chart.len() - 1);
+    chart
+}
+
 fn main() {
     for note in &NOTE_MAP {
-        let progression = ChordProgression::new(note, &Key::Major, &BLUES_STANDARD);
-        let chart = format_chord_chart(progression.chords);
+        let progression = ChordProgression::new(note, &Key::Major, &BLUES_QUICK_CHANGE);
+        let chart = format_synced_chord_chart(progression.chords);
         println!("{}", chart);
     }
 
-    // let chart = generate_random_chord_chart(32);
-
+    let chart = generate_random_chord_chart(32);
+    println!("{}", chart);
 }
 
 #[cfg(test)]

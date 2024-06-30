@@ -1,37 +1,44 @@
 use crate::*;
 
-pub const TWO_FIVE_ONE: [GenericChord; 3] = [
-    GenericChord {scale_tone: ScaleTone::Two, chord_type: ChordType::MinorSeven},
-    GenericChord {scale_tone: ScaleTone::Five, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::MajorSeven},
+pub const TWO_FIVE_ONE: [GenericChordSynced; 3] = [
+    GenericChordSynced {generic_chord: GenericChord{scale_tone: ScaleTone::Two, chord_type: ChordType::MinorSeven}, beats: 2},
+    GenericChordSynced {generic_chord: GenericChord{scale_tone: ScaleTone::Five, chord_type: ChordType::DominantSeven}, beats: 2},
+    GenericChordSynced {generic_chord: GenericChord{scale_tone: ScaleTone::One, chord_type: ChordType::MajorSeven}, beats: 4},
 ];
 
-pub const BLUES_STANDARD: [GenericChord; 12] = [
-    GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::Four, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::Four, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::Five, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::Four, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven},
+pub const JAPAN_GAMERS: [GenericChordSynced; 4] = [
+    GenericChordSynced {generic_chord: GenericChord{scale_tone: ScaleTone::Four, chord_type: ChordType::MajorSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord{scale_tone: ScaleTone::Five, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord{scale_tone: ScaleTone::Three, chord_type: ChordType::MinorSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord{scale_tone: ScaleTone::Six, chord_type: ChordType::MinorSeven}, beats: 4},
 ];
 
-pub const BLUES_QUICK_CHANGE: [GenericChord; 12] = [
-    GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::Four, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::Four, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::Four, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::Five, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::Four, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven},
-    GenericChord {scale_tone: ScaleTone::Five, chord_type: ChordType::DominantSeven},
+pub const BLUES_STANDARD: [GenericChordSynced; 12] = [
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::Four, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::Four, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::Five, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::Four, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven}, beats: 4},
+];
+
+pub const BLUES_QUICK_CHANGE: [GenericChordSynced; 12] = [
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::Four, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::Four, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::Four, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::Five, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::Four, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::One, chord_type: ChordType::DominantSeven}, beats: 4},
+    GenericChordSynced {generic_chord: GenericChord {scale_tone: ScaleTone::Five, chord_type: ChordType::DominantSeven}, beats: 4},
 ];
