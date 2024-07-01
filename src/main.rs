@@ -186,21 +186,31 @@ impl Distribution<Pitch> for Standard {
 
 #[derive(Debug, Clone, PartialEq)]
 enum ChordType {
+    Major,
+    Minor,
     MajorSeven,
     MinorSeven,
     DominantSeven,
     DominantSevenFlatNine,
     Diminished,
+    MinorSevenFlatFive,
+    Augmented,
+    AugmentedSeven,
 }
 
 impl fmt::Display for ChordType {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let chord = match self {
+            ChordType::Major => "",
+            ChordType::Minor => "m",
             ChordType::MajorSeven => "maj7",
             ChordType::MinorSeven => "m7",
             ChordType::DominantSeven => "7",
             ChordType::DominantSevenFlatNine => "7♭9",
-            ChordType::Diminished => "dim"
+            ChordType::Diminished => "dim",
+            ChordType::MinorSevenFlatFive => "m7♭5",
+            ChordType::Augmented => "+",
+            ChordType::AugmentedSeven => "+7",
         };
         write!(f, "{}", chord)
     }
