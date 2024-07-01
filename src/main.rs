@@ -189,6 +189,8 @@ enum ChordType {
     MajorSeven,
     MinorSeven,
     DominantSeven,
+    DominantSevenFlatNine,
+    Diminished,
 }
 
 impl fmt::Display for ChordType {
@@ -197,6 +199,8 @@ impl fmt::Display for ChordType {
             ChordType::MajorSeven => "maj7",
             ChordType::MinorSeven => "m7",
             ChordType::DominantSeven => "7",
+            ChordType::DominantSevenFlatNine => "7♭9",
+            ChordType::Diminished => "dim"
         };
         write!(f, "{}", chord)
     }
@@ -408,44 +412,45 @@ fn format_synced_chord_chart(chords: Vec<ChordSynced>) -> String {
         _ => panic!("error formatting width")
     };
 
-    let mut chart = String::from("|");
+    let mut chart = String::from("| ");
     let mut beats = 0;
     let mut bars = 0;
     for c in chords {
-        bars += 1;
         beats += c.beats;
         match c.beats {
-            1 => chart.push_str(&format!(" {:<1$} ", c.chord.to_string(), max_width / 4)),
-            2 => chart.push_str(&format!(" {:<1$} ", c.chord.to_string(), max_width / 2)),
-            3 => chart.push_str(&format!(" {:<1$} ", c.chord.to_string(), (max_width * 2) / 3)),
-            4 => chart.push_str(&format!(" {:<1$} ", c.chord.to_string(), max_width)),
+            1 => chart.push_str(&format!("{:<1$}", c.chord.to_string(), max_width / 4)),
+            2 => chart.push_str(&format!("{:<1$}", c.chord.to_string(), max_width / 2)),
+            3 => chart.push_str(&format!("{:<1$}", c.chord.to_string(), (max_width * 2) / 3)),
+            4 => chart.push_str(&format!("{:<1$}", c.chord.to_string(), max_width)),
             _ => panic!("unimplemented beat value")
         }
         if beats == 4 {
+            bars += 1;
             beats = 0;
             if bars == 4 {
                 bars = 0;
-                chart.push_str("|\n|");
+                chart.push_str(" |\n| ");
             } else {
-                chart.push_str("|");
+                chart.push_str(" | ");
             }
         } else if beats > 4 {
             panic!("unimplemented time signature")
         }
     }
-    chart.remove(chart.len() - 1);
-    chart
+    let chart = chart.trim_end_matches("\n| ");
+    chart.to_string()
 }
 
 fn main() {
     for note in &NOTE_MAP {
-        let progression = ChordProgression::new(note, &Key::Major, &BLUES_QUICK_CHANGE);
+        let progression = ChordProgression::new(note, &Key::Major, &BLUES_BASIE);
         let chart = format_synced_chord_chart(progression.chords);
         println!("{}", chart);
+        println!()
     }
 
-    let chart = generate_random_chord_chart(32);
-    println!("{}", chart);
+    // let chart = generate_random_chord_chart(32);
+    // println!("{}", chart);
 }
 
 #[cfg(test)]
