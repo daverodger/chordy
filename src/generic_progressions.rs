@@ -1,4 +1,4 @@
-use crate::*;
+use crate::types::*;
 
 pub const TWO_FIVE_ONE: [GenericChordSynced; 3] = [
     GenericChordSynced {generic_chord: GenericChord{scale_tone: ScaleTone::Two, chord_type: ChordType::MinorSeven}, beats: 2},
