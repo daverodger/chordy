@@ -1,7 +1,7 @@
 [
   {
-    "name": "two_five_one",
-    "tonality": "major",
+    "name": "II-V-I",
+    "tonality": "Major",
     "progression": "IImin7(4) V7(4) Imaj7(4)"
   }
 ]

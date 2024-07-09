@@ -8,3 +8,10 @@ pub fn solve_interval(root: Note, tone: ScaleTone) -> Note {
     let new_position = (position + shift) % NOTE_MAP.len();
     NOTE_MAP.get(new_position).unwrap().clone()
 }
+
+pub fn is_roman_tone(c: char) -> bool {
+    match c {
+        'I' | 'V' => true,
+        _ => false
+    }
+}

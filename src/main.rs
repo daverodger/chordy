@@ -1,13 +1,14 @@
 #![allow(dead_code)]
 
 use chord_generator::charts::*;
-use chord_generator::generic_progressions::*;
 use chord_generator::helpers::solve_interval;
+use chord_generator::progression_parser::parse_progression_file;
 use chord_generator::types::*;
 
 fn main() {
+    let progressions = parse_progression_file().unwrap().get(0).unwrap().to_owned();
     for note in &NOTE_MAP {
-        let progression = ChordProgression::new(note, &Key::Major, &BLUES_BASIE);
+        let progression = ChordProgression::new(note, &progressions.tonality, &progressions.progression);
         let chart = format_synced_chord_chart(progression.chords);
         println!("{}", chart);
         println!()

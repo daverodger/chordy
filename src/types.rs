@@ -98,11 +98,11 @@ pub struct ChordSynced {
 pub struct ChordProgression {
     pub root: Note,
     pub chords: Vec<ChordSynced>,
-    pub key: Key,
+    pub key: Tonality,
 }
 
 impl ChordProgression {
-    pub fn new<I>(root: &Note, key: &Key, tones: &I) -> Self
+    pub fn new<I>(root: &Note, key: &Tonality, tones: &I) -> Self
     where
         I: IntoIterator<Item=GenericChordSynced> + Clone,
     {
@@ -128,7 +128,7 @@ impl ChordProgression {
     }
 
     pub fn auto_convert_flats(&mut self) {
-        if self.key == Key::Major
+        if self.key == Tonality::Major
             && ((self.root.raw_note.0 == 'F' && self.root.pitch == Pitch::Natural)
             || (self.root.raw_note.0 == 'A' && self.root.pitch == Pitch::Sharp)
             || (self.root.raw_note.0 == 'D' && self.root.pitch == Pitch::Sharp)
@@ -137,7 +137,7 @@ impl ChordProgression {
             for c in &mut self.chords {
                 c.chord.note = c.chord.note.sharp_to_flat();
             }
-        } else if self.key == Key::Minor
+        } else if self.key == Tonality::Minor
             && ((self.root.raw_note.0 == 'D' && self.root.pitch == Pitch::Natural)
             || (self.root.raw_note.0 == 'G' && self.root.pitch == Pitch::Natural)
             || (self.root.raw_note.0 == 'D' && self.root.pitch == Pitch::Natural)
@@ -151,7 +151,14 @@ impl ChordProgression {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum Key {
+pub struct GenericProgression {
+    pub name: String,
+    pub tonality: Tonality,
+    pub progression: Vec<GenericChordSynced>,
+}
+
+#[derive(Debug, PartialEq, Clone, EnumString)]
+pub enum Tonality {
     Major,
     Minor,
 }
@@ -299,17 +306,27 @@ impl Distribution<Pitch> for Standard {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, EnumString)]
 pub enum ChordType {
+    #[strum(serialize = "")]
     Major,
+    #[strum(serialize = "m")]
     Minor,
+    #[strum(serialize = "maj7")]
     MajorSeven,
+    #[strum(serialize = "min7")]
     MinorSeven,
+    #[strum(serialize = "7")]
     DominantSeven,
+    #[strum(serialize = "7b9")]
     DominantSevenFlatNine,
+    #[strum(serialize = "dim")]
     Diminished,
+    #[strum(serialize = "m7b5")]
     MinorSevenFlatFive,
+    #[strum(serialize = "+")]
     Augmented,
+    #[strum(serialize = "+7")]
     AugmentedSeven,
 }
 
