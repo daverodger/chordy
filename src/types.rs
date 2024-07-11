@@ -279,6 +279,29 @@ impl Note {
             _ => ()
         }
     }
+
+    pub fn from_str(s: &str) -> Option<Self> {
+        match s.len() {
+            1 => Some(Note {
+                raw_note: RawNote::from(s.chars().next().unwrap().to_ascii_uppercase()),
+                pitch: Pitch::Natural
+            }),
+            2 => {
+                let mut s = s.chars();
+                Some(Note {
+                    raw_note: RawNote::from(s.next().unwrap().to_ascii_uppercase()),
+                    pitch: {
+                        match s.next().unwrap() {
+                            '#' => Pitch::Sharp,
+                            'b' => Pitch::Flat,
+                            _ => return None
+                        }
+                    }
+                })
+            },
+            _ => None
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]

@@ -1,3 +1,4 @@
+use rand::{Rng, thread_rng};
 use crate::types::*;
 
 pub fn solve_interval(root: Note, tone: ScaleTone) -> Note {
@@ -25,24 +26,30 @@ pub fn find_progression(progressions: Vec<GenericProgression>, name: &str) -> Op
     None
 }
 
+pub fn random_progression(progressions: Vec<GenericProgression>) -> Option<GenericProgression> {
+    if progressions.is_empty() {return None}
+    let r = thread_rng().gen_range(0..progressions.len());
+    Some(progressions.get(r).expect("should be inside range bounds").clone())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn interval_solver() {
-        let note = Note::new('D', Pitch::Natural);
+        let note = Note::new(RawNote::from('D'), Pitch::Natural);
 
         let five = ScaleTone::Five;
         let new = solve_interval(note.clone(), five);
-        assert_eq!(new, Note::new('A', Pitch::Natural));
+        assert_eq!(new, Note::new(RawNote::from('A'), Pitch::Natural));
 
         let flat_two = ScaleTone::FlatTwo;
         let new = solve_interval(note.clone(), flat_two);
-        assert_eq!(new, Note::new('D', Pitch::Sharp));
+        assert_eq!(new, Note::new(RawNote::from('D'), Pitch::Sharp));
 
         let seven = ScaleTone::Seven;
         let new = solve_interval(note.clone(), seven);
-        assert_eq!(new, Note::new('C', Pitch::Sharp));
+        assert_eq!(new, Note::new(RawNote::from('C'), Pitch::Sharp));
     }
 }

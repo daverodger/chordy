@@ -20,7 +20,8 @@ pub fn format_chord_chart(chord: Vec<Chord>) -> String {
         chart.push_str("\n");
     }
     );
-    chart
+    let chart = chart.trim_end_matches("\n");
+    chart.to_string()
 }
 
 pub fn format_synced_chord_chart(chords: Vec<ChordSynced>) -> String {
