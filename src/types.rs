@@ -22,7 +22,7 @@ pub static NOTE_MAP: [Note; 12] = [
     Note { raw_note: RawNote('G'), pitch: Pitch::Sharp },
 ];
 
-pub const RAW_NOTE_MAP: [char; 7] = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+pub const RAW_NOTE_MAP: [RawNote; 7] = [RawNote('A'), RawNote('B'), RawNote('C'), RawNote('D'), RawNote('E'), RawNote('F'), RawNote('G')];
 
 pub const TONE_MAP: [ScaleTone; 12] = [
     ScaleTone::One,
@@ -148,6 +148,10 @@ impl ChordProgression {
             }
         }
     }
+
+    pub fn from_generic(note: &Note, p: &GenericProgression) -> Self {
+        Self::new(note, &p.tonality, &p.progression)
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -183,7 +187,7 @@ impl fmt::Display for RawNote {
 
 impl Distribution<RawNote> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> RawNote {
-        match rng.gen_range(0..=6) {
+        match rng.gen_range(0..7) {
             0 => RawNote::from('A'),
             1 => RawNote::from('B'),
             2 => RawNote::from('C'),
@@ -218,8 +222,8 @@ impl Default for Note {
 }
 
 impl Note {
-    pub fn new(raw_note: char, pitch: Pitch) -> Self {
-        let mut note = Note { raw_note: RawNote::from(raw_note), pitch };
+    pub fn new(raw_note: RawNote, pitch: Pitch) -> Self {
+        let mut note = Note { raw_note, pitch };
         note.normalize();
         note
     }
@@ -230,7 +234,7 @@ impl Note {
         }
         let position = RAW_NOTE_MAP
             .iter()
-            .position(|&x| x == self.raw_note.0)
+            .position(|&x| x == self.raw_note)
             .unwrap();
         let new_position = (position + 1) % RAW_NOTE_MAP.len();
         Note::new(RAW_NOTE_MAP[new_position], Pitch::Flat)
@@ -242,7 +246,7 @@ impl Note {
         }
         let position = RAW_NOTE_MAP
             .iter()
-            .position(|&x| x == self.raw_note.0)
+            .position(|&x| x == self.raw_note)
             .unwrap();
         let new_position: usize;
         match position {
@@ -350,10 +354,17 @@ impl fmt::Display for ChordType {
 
 impl Distribution<ChordType> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> ChordType {
-        match rng.gen_range(0..=2) {
-            0 => ChordType::MajorSeven,
-            1 => ChordType::MinorSeven,
-            2 => ChordType::DominantSeven,
+        match rng.gen_range(0..10) {
+            0 => ChordType::Major,
+            1 => ChordType::Minor,
+            2 => ChordType::MajorSeven,
+            3 => ChordType::MinorSeven,
+            4 => ChordType::DominantSeven,
+            5 => ChordType::DominantSevenFlatNine,
+            6 => ChordType::Diminished,
+            7 => ChordType::MinorSevenFlatFive,
+            8 => ChordType::Augmented,
+            9 => ChordType::AugmentedSeven,
             _ => panic!("outside of chord range")
         }
     }
