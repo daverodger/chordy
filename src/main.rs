@@ -1,41 +1,25 @@
 #![allow(dead_code)]
 
-use chord_generator::charts::*;
-use chord_generator::helpers::solve_interval;
-use chord_generator::progression_parser::parse_progression_file;
-use chord_generator::types::*;
+use sarge::prelude::*;
+use chord_generator::charts::generate_random_chord_chart;
 
-fn main() {
-    let progressions = parse_progression_file().unwrap().get(0).unwrap().to_owned();
-    for note in &NOTE_MAP {
-        let progression = ChordProgression::new(note, &progressions.tonality, &progressions.progression);
-        let chart = format_synced_chord_chart(progression.chords);
-        println!("{}", chart);
-        println!()
-    }
-
-    // let chart = generate_random_chord_chart(32);
-    // println!("{}", chart);
+sarge! {
+    Args,
+    #ok 'p' progression: String,
+    'r' random: bool,
+    #ok 'k' key: String,
+    #ok 'b' bars: u8,
 }
 
-#[cfg(test)]
-mod tests {
-    use crate::{Note, Pitch, ScaleTone, solve_interval};
-
-    #[test]
-    fn interval_solver() {
-        let note = Note::new('D', Pitch::Natural);
-
-        let five = ScaleTone::Five;
-        let new = solve_interval(note.clone(), five);
-        assert_eq!(new, Note::new('A', Pitch::Natural));
-
-        let flat_two = ScaleTone::FlatTwo;
-        let new = solve_interval(note.clone(), flat_two);
-        assert_eq!(new, Note::new('D', Pitch::Sharp));
-
-        let seven = ScaleTone::Seven;
-        let new = solve_interval(note.clone(), seven);
-        assert_eq!(new, Note::new('C', Pitch::Sharp));
+fn main() {
+    let (args, _remainder) = Args::parse().expect("failed to parse arguments");
+    match (args.progression, args.key, args.bars, args.random) {
+        (None, None, None, false) => println!("{}", generate_random_chord_chart(32)),
+        (None, key, None, true) => {
+            todo!()
+        }
+        _ => ()
     }
+
+
 }
