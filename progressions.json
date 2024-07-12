@@ -3,5 +3,30 @@
     "name": "II-V-I",
     "tonality": "Major",
     "progression": "IImin7(4) V7(4) Imaj7(4)"
+  },
+  {
+    "name": "Japanese_Games",
+    "tonality": "Major",
+    "progression": "IVmaj7 V7 IIImin7 IVmin7"
+  },
+  {
+    "name": "Basie_Blues",
+    "tonality": "Major",
+    "progression": "I7 IV7b9(2) bVdim(2) I7 Vmin7(2) I7(2) IV7 bVdim I7 VI7b9 IImin7 V7 I7 I7"
+  },
+  {
+    "name": "Bebop_Blues",
+    "tonality": "Major",
+    "progression": "I7 IV7 I7 Vmin7(2) I7(2) IV7 bVdim I7 IIImin7b5(2) VI7b9(2) IImin7 V7 IIImin7(2) VI7(2) IImin7(2) V7(2)"
+  },
+  {
+    "name": "Tritone_Sub_Blues",
+    "tonality": "Major",
+    "progression": "I7 IV7 I7 Vmin7(2) I7(2) IV7 bVmin7(2) VII7(2) I7(2) VII7(2) bVII7(2) VI7b9(2) IImin7 V7(2) IV7(2) IIImin7(2) VI7(2) IImin7(2) V7(2)"
+  },
+  {
+    "name": "Bird_Blues",
+    "tonality": "Major",
+    "progression": "I7 VIImin7b5(2) III7b9(2) VI7(2) IImin7(2) V7(2) I7(2) IV7 IVmin7(2) bVII7(2) IIImin7(2) VI7(2) bIIImin7(2) bVI7(2) IImin7 V7 IIImin7(2) VI7(2) IImin7(2) V7(2)"
   }
 ]
