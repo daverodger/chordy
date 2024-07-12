@@ -17,19 +17,46 @@ pub fn is_roman_tone(c: char) -> bool {
     }
 }
 
-pub fn find_progression(progressions: Vec<GenericProgression>, name: &str) -> Option<GenericProgression> {
+pub fn find_progression(progressions: &Vec<GenericProgression>, name: &str) -> Option<GenericProgression> {
     for p  in progressions {
         if p.name.eq_ignore_ascii_case(name) {
-            return Some(p)
+            return Some(p.clone())
         }
     }
     None
 }
 
-pub fn random_progression(progressions: Vec<GenericProgression>) -> Option<GenericProgression> {
+pub fn random_progression(progressions: &Vec<GenericProgression>) -> Option<GenericProgression> {
     if progressions.is_empty() {return None}
     let r = thread_rng().gen_range(0..progressions.len());
     Some(progressions.get(r).expect("should be inside range bounds").clone())
+}
+
+pub fn help_display() -> String {
+    r#"
+    Generates chords and chord progressions.
+
+    Passing no arguments generates 24 random chords, or use '-b [INTEGER]' to customize the number of chords.
+
+    Use '-p [NAME]' or '-r' to display chord progressions with optional key center using '-k'.
+
+      -l, --list                list names of all chord progressions defined in 'progressions.json'
+      -p, --progression=NAME    display progression matching provided NAME parameter
+      -k, --key=[A-G][#,b]      provide key center for selected progression, otherwise key is randomized
+      -r, --random              display random progression (use with -k flag for key center)
+      -b, --bars=INTEGER        display a number of random chords equal to provided value
+      -h, --help                display this help menu
+    "#.to_string()
+}
+
+pub fn list_all_progressions(progressions: Vec<GenericProgression>) -> String {
+    let mut res = String::new();
+    for p in progressions {
+        res.push_str(&p.name);
+        res.push('\n');
+    }
+    let res = res.trim_end();
+    res.to_string()
 }
 
 #[cfg(test)]
