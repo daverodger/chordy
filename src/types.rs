@@ -349,11 +349,11 @@ pub enum ChordType {
     DominantSevenFlatNine,
     #[strum(serialize = "dim")]
     Diminished,
-    #[strum(serialize = "m7b5")]
+    #[strum(serialize = "min7b5")]
     MinorSevenFlatFive,
-    #[strum(serialize = "+")]
+    #[strum(serialize = "+", serialize = "aug")]
     Augmented,
-    #[strum(serialize = "+7")]
+    #[strum(serialize = "+7", serialize = "aug7")]
     AugmentedSeven,
 }
 
