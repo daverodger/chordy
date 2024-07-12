@@ -142,7 +142,7 @@ mod tests {
         let chord1 = GenericChordSynced {
             generic_chord: GenericChord {
                 scale_tone: ScaleTone::Two,
-                chord_type: ChordType::MinorSeven,
+                chord_type: ChordType::MinorSevenFlatFive,
             },
             beats: 4,
         };
@@ -160,6 +160,6 @@ mod tests {
             },
             beats: 4,
         };
-        assert_eq!(parse_chord_prog("IImin7(4) V7(4) Imaj7(4)"), vec![chord1, chord2, chord3]);
+        assert_eq!(parse_chord_prog("IImin7b5(4) V7(4) Imaj7(4)"), vec![chord1, chord2, chord3]);
     }
 }
