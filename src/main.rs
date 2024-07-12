@@ -33,7 +33,7 @@ fn main() {
         std::process::exit(0);
     }
 
-    let mut chart: String;
+    let chart: String;
     match (args.progression, args.key, args.bars, args.random) {
         (None, None, bars, false) => {
             chart = generate_random_chord_chart(bars.unwrap_or(24));
