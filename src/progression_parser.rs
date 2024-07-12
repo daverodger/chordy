@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 use std::{env, fs};
+use std::path::PathBuf;
 use std::str::FromStr;
 
 use nom::{bytes::complete::take_while1, IResult};
@@ -23,9 +24,13 @@ struct RawProgression {
 }
 
 pub fn parse_progression_file() -> Result<Vec<GenericProgression>> {
-    let exe_path = env::current_exe().expect("Failed to get executable path");
-    let exe_dir = exe_path.parent().expect("Failed to get executable directory");
-    let data_file_path = exe_dir.join("progressions.json");
+    let data_file_path = if cfg!(debug_assertions) {
+        PathBuf::from(env!("OUT_DIR")).join("progressions.json")
+    } else {
+        let exe_path = env::current_exe().expect("Failed to get executable path");
+        let exe_dir = exe_path.parent().expect("Failed to get executable directory");
+        exe_dir.join("progressions.json")
+    };
     let file = fs::read(data_file_path.clone()).expect(&format!("Failed to read data file: {:?}", data_file_path));
     let progressions: Vec<RawProgression> = serde_json::from_slice(&file)?;
     let progressions = progressions
