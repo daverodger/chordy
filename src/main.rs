@@ -33,7 +33,7 @@ fn main() {
         std::process::exit(0);
     }
 
-    let mut chart = String::new();
+    let mut chart: String;
     match (args.progression, args.key, args.bars, args.random) {
         (None, None, bars, false) => {
             chart = generate_random_chord_chart(bars.unwrap_or(24));
@@ -44,11 +44,13 @@ fn main() {
                 Some(k) => {
                     let key = Note::from_str(&k).expect("failed to parse key");
                     let prog = ChordProgression::from_generic(&key, &p);
-                    chart = format_synced_chord_chart(prog.chords);
+                    let name = p.name.replace("_", " ");
+                    chart = format!("{}\n{}", name, format_synced_chord_chart(prog.chords));
                 }
                 None => {
                     let prog = ChordProgression::from_generic(&random(), &p);
-                    chart = format_synced_chord_chart(prog.chords);
+                    let name = p.name.replace("_", " ");
+                    chart = format!("{}\n{}", name, format_synced_chord_chart(prog.chords));
                 }
             }
         }
@@ -62,7 +64,8 @@ fn main() {
                         None => note = random(),
                         Some(k) => note = Note::from_str(&k).unwrap(),
                     }
-                    chart = format_synced_chord_chart(ChordProgression::from_generic(&note, &prog).chords);
+                    let name = prog.name.replace("_", " ");
+                    chart = format!("{}\n{}", name, format_synced_chord_chart(ChordProgression::from_generic(&note, &prog).chords));
                 }
             }
         }
